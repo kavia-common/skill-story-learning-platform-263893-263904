@@ -1,0 +1,4 @@
+{
+    "command": "cd db_visualizer && npm install",
+    "working_directory": "/home/kavia/workspace/code-generation/skill-story-learning-platform-263893-263904/skill_story_database"
+}

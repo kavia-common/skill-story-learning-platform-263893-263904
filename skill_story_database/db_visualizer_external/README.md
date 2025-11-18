@@ -1,10 +1,11 @@
-# Database Visualizer (Optional)
+# Database Visualizer (Optional - External Only)
 
 This folder contains a very simple Node.js/Express-based database viewer useful for local diagnostics.
 
 Important:
 - Do NOT run this viewer inside the skill_story_database container. The database container must only run PostgreSQL.
 - The backend and frontend containers are the only services that should run Node.js. If you want to use this viewer, run it on your host machine or in a separate, dedicated utility container.
+- This directory was intentionally renamed to `db_visualizer_external` to avoid accidental in-container execution.
 
 How to use (host machine or separate utility container):
 1) Ensure you have Node.js installed (v18+ recommended).

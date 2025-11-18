@@ -1,4 +1,17 @@
 #!/bin/bash
+set -euo pipefail
+
+# Guard: Ensure this script never runs Node or the optional db_visualizer
+if ps aux | grep -E "[n]ode|[n]pm start" >/dev/null 2>&1; then
+  echo "[Guard] Detected a running Node/npm process in the database container. This is not allowed."
+  echo "[Guard] Terminating to prevent unintended Express startup."
+  exit 1
+fi
+
+if [ -d "db_visualizer" ] || [ -d "db_visualizer_external" ]; then
+  echo "[Guard] db_visualizer assets present. They are for external use ONLY."
+  echo "[Guard] This script will not execute any viewer or Node processes."
+fi
 
 # Minimal PostgreSQL startup script with full paths
 DB_NAME="myapp"
@@ -133,8 +146,9 @@ EOF
 echo "psql postgresql://${DB_USER}:${DB_PASSWORD}@localhost:${DB_PORT}/${DB_NAME}" > db_connection.txt
 echo "Connection string saved to db_connection.txt"
 
-# Save environment variables to a file
-cat > db_visualizer/postgres.env << EOF
+# Save environment variables to a file (external viewer only)
+mkdir -p db_visualizer_external
+cat > db_visualizer_external/postgres.env << EOF
 export POSTGRES_URL="postgresql://localhost:${DB_PORT}/${DB_NAME}"
 export POSTGRES_USER="${DB_USER}"
 export POSTGRES_PASSWORD="${DB_PASSWORD}"
@@ -148,10 +162,10 @@ echo "User: ${DB_USER}"
 echo "Port: ${DB_PORT}"
 echo ""
 
-echo "Environment variables saved to db_visualizer/postgres.env"
+echo "Environment variables saved to db_visualizer_external/postgres.env"
 echo "Note: The db_visualizer is an optional, separate Node.js utility and must not be run inside the database container."
 echo "If you choose to use it, run it from a separate Node environment (e.g., your host or a dedicated utility container) after sourcing:"
-echo "  source db_visualizer/postgres.env"
+echo "  source db_visualizer_external/postgres.env"
 echo ""
 echo "[Guard] This container will NOT start any Node/Express process."
 echo "[Guard] Ensure that no Dockerfile CMD/ENTRYPOINT or orchestrator invokes 'node server.js' or 'npm start' here."
@@ -159,3 +173,5 @@ echo ""
 echo "To connect to the database, use one of the following commands:"
 echo "psql -h localhost -U ${DB_USER} -d ${DB_NAME} -p ${DB_PORT}"
 echo "$(cat db_connection.txt)"
+# Exit successfully; container orchestrator should keep Postgres running via the launched process.
+exit 0

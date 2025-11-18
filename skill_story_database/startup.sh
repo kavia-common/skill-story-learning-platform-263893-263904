@@ -149,8 +149,10 @@ echo "Port: ${DB_PORT}"
 echo ""
 
 echo "Environment variables saved to db_visualizer/postgres.env"
-echo "To use with Node.js viewer, run: source db_visualizer/postgres.env"
-
+echo "Note: The db_visualizer is an optional, separate Node.js utility and must not be run inside the database container."
+echo "If you choose to use it, run it from a separate Node environment (e.g., your host or a dedicated utility container) after sourcing:"
+echo "  source db_visualizer/postgres.env"
+echo ""
 echo "To connect to the database, use one of the following commands:"
 echo "psql -h localhost -U ${DB_USER} -d ${DB_NAME} -p ${DB_PORT}"
 echo "$(cat db_connection.txt)"
